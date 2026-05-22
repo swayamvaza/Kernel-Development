@@ -24,11 +24,22 @@ yay -S i686-elf-binutils-bin i686-elf-gcc-bin
 
 ```
 
+## Steps for you my friend
+
+* i hope that cross compiler shit is installed successfully now we need to do is to make a dir `*osdev*` or `*doorsOS*` whatever
+
+* make a src dir and then add three files `*boot.s*`, `*kernel.c*` and `*linked.ld*`
+
+* why the frick i m even typing i have uploaded the whole shit lol(i forgor)
+
+
 ## Project Structure
 
 ![Hierarchy](images/Screenshot%20From%202026-05-22%2017-37-23.png)
 
 ## Build n Run Cmd
+
+LOCK IN HERE
 
 | Command | Action |
 | :--- | :--- |
@@ -39,7 +50,7 @@ yay -S i686-elf-binutils-bin i686-elf-gcc-bin
 
 ## Debugging
 
-The **`make run`** target is configured with specific QEMU flags to assist in kernel debugging:
+* The **`make run`** target is configured with specific QEMU flags to assist in kernel debugging:
 
 * **`-d int,cpu_reset`**: Enables logging for hardware interrupts and CPU reset events.
 * **`-no-reboot`**: Halts the emulator on a Triple Fault, allowing you to examine the register dump provided by QEMU.
