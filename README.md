@@ -72,4 +72,6 @@ LOCK IN HERE
 
 * [ ] Keyboard Driver (i have two braincells)
 
-
+## lol
+[Dunning-Kruger](https://en.wikipedia.org/wiki/Dunning–Kruger_effect)
+![](images/Screenshot_From_2026-05-22_17-56-15.png)
