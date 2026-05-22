@@ -69,4 +69,6 @@ LOCK IN HERE
 
 * [ ] Interrupt Descriptor Table (IDT) (might need to sacrifice someone)
 
-* [ ] Keyboard Driver (aukat se bahar)
+* [ ] Keyboard Driver (i have two braincells)
+
+
