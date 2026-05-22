@@ -75,4 +75,4 @@ LOCK IN HERE
 ## lol
 [Dunning-Kruger](https://en.wikipedia.org/wiki/Dunning–Kruger_effect)
 
-![LOL](images/Screenshot%From%2026-05-22%17-56-15.png)
+![LOL](images/Screenshot%20From%202026-05-22%2017-56-15.png)
