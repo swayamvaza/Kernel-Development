@@ -1,4 +1,24 @@
-all:
-    docker run --rm -v "$(PWD):/osdev" -w /osdev randomdude/gcc-cross-x86_64-elf \
-    x86_64-elf-gcc -m32 -T src/linker.ld -o myos.bin -ffreestanding -O2 -nostdlib \
-    src/boot.s src/kernel.c -Wl,-m,elf_i386 -Wl,-z,max-page-size=4096
+# Compiler and Assembler
+CC=i686-elf-gcc
+AS=i686-elf-as
+
+# Build flags
+CFLAGS=-std=gnu99 -ffreestanding -O2 -Wall -Wextra
+LDFLAGS=-T src/linker.ld -ffreestanding -O2 -nostdlib
+
+all: myos.bin
+
+myos.bin: boot.o kernel.o
+	$(CC) $(LDFLAGS) -o myos.bin boot.o kernel.o -lgcc
+
+boot.o: src/boot.s
+	$(AS) src/boot.s -o boot.o
+
+kernel.o: src/kernel.c
+	$(CC) -c src/kernel.c -o kernel.o $(CFLAGS)
+
+run: all
+	qemu-system-i386 -kernel myos.bin -d int,cpu_reset -no-reboot
+
+clean:
+	rm -rf myos.bin boot.o kernel.o
