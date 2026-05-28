@@ -9,7 +9,7 @@
 .set CHECKSUM, -(MAGIC + FLAGS)
 
 # Multiboot header - Required by GRUB to recognize your kernel
-.section .multiboot
+.section .multiboot, "a"
 .align 4
 .long MAGIC
 .long FLAGS

@@ -1,8 +1,15 @@
 ENTRY(_start)
+
 SECTIONS {
     . = 1M;
-    .text : { *(.multiboot) *(.text) }
+
+    .text : {
+        /* Force retention of the header so the bootloader finds it */
+        KEEP(*(.multiboot))
+        *(.text)
+    }
+
     .rodata : { *(.rodata) }
-    .data : { *(.data) }
-    .bss : { *(.bss) }
+    .data   : { *(.data) }
+    .bss    : { *(.bss)  }
 }

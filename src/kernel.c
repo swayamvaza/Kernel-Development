@@ -1,8 +1,10 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <io.h>
+#include "gdt.h"
+#include "idt.h"
 
-/* Hardware text mode color constants. */
 enum vga_color {
     VGA_COLOR_BLACK = 0,
     VGA_COLOR_BLUE = 1,
@@ -22,18 +24,16 @@ enum vga_color {
     VGA_COLOR_WHITE = 15,
 };
 
-/* VGA Hardware Constants */
 #define VGA_WIDTH   80
 #define VGA_HEIGHT  25
 #define VGA_MEMORY  0xB8000 
 
-/* Global state for the terminal */
+extern void terminal_putchar(char c);
+
 size_t terminal_row;
 size_t terminal_column;
 uint8_t terminal_color;
 uint16_t* terminal_buffer = (uint16_t*)VGA_MEMORY;
-
-/* Function Definitions */
 
 static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg) 
 {
@@ -65,31 +65,7 @@ void terminal_putentryat(char c, uint8_t color, size_t x, size_t y)
     terminal_buffer[index] = vga_entry(c, color);
 }
 
-void terminal_putchar(char c) {
-    if (c == '\n') {
-        terminal_column = 0;
-        terminal_row++;
-    } else {
-        terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
-        if (++terminal_column == VGA_WIDTH) {
-            terminal_column = 0;
-            terminal_row++;
-        }
-    }
 
-    /* SCROLLING LOGIC */
-    if (terminal_row == VGA_HEIGHT) {
-        for (size_t y = 1; y < VGA_HEIGHT; y++) {
-            for (size_t x = 0; x < VGA_WIDTH; x++) {
-                terminal_buffer[(y - 1) * VGA_WIDTH + x] = terminal_buffer[y * VGA_WIDTH + x];
-            }
-        }
-        for (size_t x = 0; x < VGA_WIDTH; x++) {
-            terminal_buffer[(VGA_HEIGHT - 1) * VGA_WIDTH + x] = vga_entry(' ', terminal_color);
-        }
-        terminal_row = VGA_HEIGHT - 1;
-    }
-}
 
 void terminal_write(const char* data, size_t size) 
 {
@@ -110,38 +86,39 @@ void terminal_writestring(const char* data)
     terminal_write(data, strlen(data));
 }
 
-/* Print a pyramid pattern */
 void print_pyramid(int height) {
     for (int i = 0; i < height; i++) {
-        // Print leading spaces
         for (int j = 0; j < height - i - 1; j++) {
             terminal_putchar(' ');
         }
-        // Print stars
         for (int k = 0; k < (2 * i + 1); k++) {
             terminal_putchar('*');
         }
-        // Next line
         terminal_putchar('\n');
     }
 }
 
-/* The true entry point for your C code */
 void kernel_main(void) 
 {
-    // 1. Clear the screen and set up the background
-    terminal_initialize();
+    gdt_install();
+    idt_install();
+    
+    // Mask the timer, keep keyboard active
+    outb(0x21, 0xFD); 
+    outb(0xA1, 0xFF); 
 
-    // 2. Print our text
-    terminal_writestring("Hello, kernel World!\n");
-    terminal_writestring("I have successfully survived the Triple Fault.\n");
-    terminal_writestring("Here is my pattern:\n\n");
+    // --- THE FIX IS HERE ---
+    const char *str = "OS Ready - Press a Key\n> ";
+    
+    // Use your terminal function instead of raw memory manipulation!
+    for(int i = 0; str[i] != '\0'; i++) {
+        terminal_putchar(str[i]);
+    }
+    
+    // Now the CPU is listening
+    __asm__ volatile ("sti"); 
 
-    // 3. Draw the pyramid
-    print_pyramid(5);
-
-    /* 4. CPU TRAP: Halt forever so we don't crash into garbage memory */
-    for (;;) {
-        asm volatile ("hlt");
+    for(;;) {
+        __asm__ volatile ("hlt");
     }
 }
